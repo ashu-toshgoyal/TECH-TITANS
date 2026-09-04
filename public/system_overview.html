@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0f19">
+    <title>SAFEGUARD AI — System Overview</title>
+    <meta name="description" content="System overview and technical specifications of SAFEGUARD AI Industrial Safety Surveillance Engine.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="./styles copy.css">
+    <link rel="stylesheet" href="./system-overview.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+      window.addEventListener('load', function () {
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap';
+        document.head.appendChild(l);
+      });
+    </script>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
+
+  <svg id="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-locate" viewBox="0 0 24 24"><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><circle cx="12" cy="12" r="7"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></symbol>
+    <symbol id="i-trending-up" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></symbol>
+    <symbol id="i-siren" viewBox="0 0 24 24"><path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.929 4.929.707.707"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M8 3v2"/><path d="M16 3v2"/><path d="M22 8l-4 3.5v-7L22 8z"/></symbol>
+    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="6" y1="9" x2="18" y2="9"/><line x1="6" y1="13" x2="18" y2="13"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-hard-drive" viewBox="0 0 24 24"><rect width="18" height="12" x="3" y="6" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></symbol>
+    <symbol id="i-network" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></symbol>
+  </svg>
+
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon"><svg class="icon icon-lg"><use href="#i-shield-check"/></svg></div>
+        <div class="brand-text">
+          <h2>SAFEGUARD AI</h2>
+          <span>SIH Engine v2.4</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-item"><svg class="icon"><use href="#i-locate"/></svg><span>Live Monitoring</span></a>
+        <a href="system-overview.html" class="nav-item active"><svg class="icon"><use href="#i-info"/></svg><span>System Overview</span></a>
+        <a href="#safety-report" class="nav-item"><svg class="icon"><use href="#i-clipboard"/></svg><span>Safety Report</span></a>
+        <a href="#analytics" class="nav-item"><svg class="icon"><use href="#i-trending-up"/></svg><span>Incidents &amp; Trends</span></a>
+      </nav>
+
+      <div class="sidebar-telegram-actions">
+        <a href="https://t.me/Sightsafteybot" target="_blank" rel="noopener" id="open-telegram-btn" class="telegram-btn">
+          <svg class="icon icon-sm"><use href="#i-send"/></svg> Open Telegram (@Sightsafteybot)
+        </a>
+        <button id="config-telegram-btn" class="telegram-btn secondary">
+          <svg class="icon icon-sm"><use href="#i-sliders"/></svg> Config Telegram
+        </button>
+        <button id="trigger-emergency-btn" class="telegram-btn emergency-btn">
+          <svg class="icon icon-sm"><use href="#i-siren"/></svg> Emergency Override
+        </button>
+        <button id="view-logs-btn" class="telegram-btn secondary">
+          <svg class="icon icon-sm"><use href="#i-clipboard"/></svg> View Logs
+        </button>
+        <button id="download-logs-btn" class="telegram-btn secondary">
+          <svg class="icon icon-sm"><use href="#i-download"/></svg> Download Logs
+        </button>
+      </div>
+
+      <div class="system-status-card">
+        <span class="status-indicator online"></span>
+        <div class="status-info">
+          <span class="status-title">YOLOv8 Engine</span>
+          <span class="status-sub" id="engine-status-text">Active &amp; Monitoring</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-header">
+        <div class="header-title">
+          <h1>⚙️ System Overview</h1>
+          <p>Complete technical specifications and system architecture</p>
+        </div>
+        <div class="header-meta">
+          <div id="live-clock" class="time-badge">
+            <svg class="icon icon-sm"><use href="#i-clock"/></svg><span id="clock-text">2026-09-04 12:00:00</span>
+          </div>
+          <div class="location-badge">
+            <svg class="icon icon-sm"><use href="#i-map-pin"/></svg>Station Alpha · Zone 4
+          </div>
+          <button onclick="window.print()" class="export-btn">
+            <svg class="icon icon-sm"><use href="#i-download"/></svg>Export PDF Report
+          </button>
+        </div>
+      </header>
+
+      <!-- Engine Toggle -->
+      <div class="engine-toggle-container">
+        <div class="engine-toggle-wrapper">
+          <span class="engine-label">🧠 AI Engine</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="engine-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="engine-status" id="engine-status-label">ON</span>
+        </div>
+      </div>
+
+      <!-- System Overview Grid -->
+      <div class="overview-grid">
+        <!-- System Architecture -->
+        <div class="panel system-architecture-panel">
+          <div class="panel-header">
+            <h3><svg class="icon"><use href="#i-server"/></svg>System Architecture</h3>
+            <span class="badge overview-badge"><span class="dot"></span>LIVE</span>
+          </div>
+          <div class="architecture-diagram" id="architecture-diagram">
+            <div class="arch-node" data-gsap="fade-up">
+              <div class="arch-icon">📹</div>
+              <span>CCTV Input</span>
+              <div class="arch-status online">● Online</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" data-gsap="fade-up" data-delay="0.1">
+              <div class="arch-icon">🧠</div>
+              <span>YOLOv8 Engine</span>
+              <div class="arch-status online">● Online</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" data-gsap="fade-up" data-delay="0.2">
+              <div class="arch-icon">🔍</div>
+              <span>PPE Detection</span>
+              <div class="arch-status online">● Online</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" data-gsap="fade-up" data-delay="0.3">
+              <div class="arch-icon">📊</div>
+              <span>Analytics</span>
+              <div class="arch-status online">● Online</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CPU Specs -->
+        <div class="panel cpu-specs-panel">
+          <div class="panel-header">
+            <h3><svg class="icon"><use href="#i-cpu"/></svg>CPU &amp; Performance</h3>
+            <span class="badge live-badge">REAL-TIME</span>
+          </div>
+          <div class="specs-grid">
+            <div class="spec-item" data-gsap="fade-up">
+              <span class="spec-label">Processor</span>
+              <span class="spec-value">Intel® Xeon® Platinum 8380</span>
+            </div>
+            <div class="spec-item" data-gsap="fade-up" data-delay="0.1">
+              <span class="spec-label">Cores / Threads</span>
+              <span class="spec-value">40 / 80</span>
+            </div>
+            <div class="spec-item" data-gsap="fade-up" data-delay="0.2">
+              <span class="spec-label">Base Clock</span>
+              <span class="spec-value">2.3 GHz</span>
+            </div>
+            <div class="spec-item" data-gsap="fade-up" data-delay="0.3">
+              <span class="spec-label">Max Turbo</span>
+              <span class="spec-value">3.4 GHz</span>
+            </div>
+            <div class="spec-item" data-gsap="fade-up" data-delay="0.4">
+              <span class="spec-label">Cache</span>
+              <span class="spec-value">60 MB L3</span>
+            </div>
+            <div class="spec-item" data-gsap="fade-up" data-delay="0.5">
+              <span class="spec-label">Current Usage</span>
+              <span class="spec-value">
+                <div class="usage-bar">
+                  <div class="usage-fill" style="width: 45%;"></div>
+                </div>
+                45%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Specifications -->
+        <div class="panel camera-specs-panel">
+          <div class="panel-header">
+            <h3><svg class="icon"><use href="#i-camera"/></svg>Camera Specifications</h3>
+            <span class="badge live-badge"><span class="dot" style="background: #4caf50;"></span> ACTIVE</span>
+          </div>
+          <div class="camera-grid">
+            <div class="camera-item" data-gsap="fade-up">
+              <div class="camera-icon">📷</div>
+              <div class="camera-info">
+                <span class="camera-label">Model</span>
+                <span class="camera-value">Sony IMX586</span>
+              </div>
+            </div>
+            <div class="camera-item" data-gsap="fade-up" data-delay="0.1">
+              <div class="camera-icon">🎥</div>
+              <div class="camera-info">
+                <span class="camera-label">Resolution</span>
+                <span class="camera-value">1920 x 1080 (Full HD)</span>
+              </div>
+            </div>
+            <div class="camera-item" data-gsap="fade-up" data-delay="0.2">
+              <div class="camera-icon">⚡</div>
+              <div class="camera-info">
+                <span class="camera-label">Frame Rate</span>
+                <span class="camera-value">30 FPS</span>
+              </div>
+            </div>
+            <div class="camera-item" data-gsap="fade-up" data-delay="0.3">
+              <div class="camera-icon">🔭</div>
+              <div class="camera-info">
+                <span class="camera-label">Field of View</span>
+                <span class="camera-value">120° Wide Angle</span>
+              </div>
+            </div>
+            <div class="camera-item" data-gsap="fade-up" data-delay="0.4">
+              <div class="camera-icon">🌙</div>
+              <div class="camera-info">
+                <span class="camera-label">Night Vision</span>
+                <span class="camera-value">IR Illuminator (50m)</span>
+              </div>
+            </div>
+            <div class="camera-item" data-gsap="fade-up" data-delay="0.5">
+              <div class="camera-icon">📡</div>
+              <div class="camera-info">
+                <span class="camera-label">Connection</span>
+                <span class="camera-value">PoE / Wi-Fi 6</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Memory & Storage -->
+        <div class="panel memory-panel">
+          <div class="panel-header">
+            <h3><svg class="icon"><use href="#i-hard-drive"/></svg>Memory &amp; Storage</h3>
+            <span class="badge overview-badge">RAPID</span>
+          </div>
+          <div class="memory-grid">
+            <div class="memory-item" data-gsap="fade-up">
+              <span class="memory-label">RAM</span>
+              <span class="memory-value">256 GB DDR5</span>
+              <div class="usage-bar">
+                <div class="usage-fill" style="width: 62%; background: #4fc3f7;"></div>
+              </div>
+              <span class="memory-usage">62% Used</span>
+            </div>
+            <div class="memory-item" data-gsap="fade-up" data-delay="0.1">
+              <span class="memory-label">Storage</span>
+              <span class="memory-value">4 TB NVMe SSD</span>
+              <div class="usage-bar">
+                <div class="usage-fill" style="width: 38%; background: #ffb020;"></div>
+              </div>
+              <span class="memory-usage">38% Used</span>
+            </div>
+            <div class="memory-item" data-gsap="fade-up" data-delay="0.2">
+              <span class="memory-label">GPU</span>
+              <span class="memory-value">NVIDIA A100 (80GB)</span>
+              <div class="usage-bar">
+                <div class="usage-fill" style="width: 73%; background: #ff1744;"></div>
+              </div>
+              <span class="memory-usage">73% Used</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Network & System Status -->
+        <div class="panel network-panel">
+          <div class="panel-header">
+            <h3><svg class="icon"><use href="#i-network"/></svg>Network &amp; System</h3>
+            <span class="badge live-badge"><span class="dot" style="background: #4caf50;"></span> CONNECTED</span>
+          </div>
+          <div class="network-grid">
+            <div class="network-item" data-gsap="fade-up">
+              <span class="network-label">Network</span>
+              <span class="network-value">10 GbE Fiber</span>
+            </div>
+            <div class="network-item" data-gsap="fade-up" data-delay="0.1">
+              <span class="network-label">Latency</span>
+              <span class="network-value">12 ms</span>
+            </div>
+            <div class="network-item" data-gsap="fade-up" data-delay="0.2">
+              <span class="network-label">Uptime</span>
+              <span class="network-value">99.99%</span>
+            </div>
+            <div class="network-item" data-gsap="fade-up" data-delay="0.3">
+              <span class="network-label">OS</span>
+              <span class="network-value">Ubuntu 22.04 LTS</span>
+            </div>
+            <div class="network-item" data-gsap="fade-up" data-delay="0.4">
+              <span class="network-label">Python Version</span>
+              <span class="network-value">3.10.12</span>
+            </div>
+            <div class="network-item" data-gsap="fade-up" data-delay="0.5">
+              <span class="network-label">Node.js</span>
+              <span class="network-value">v25.8.1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Database -->
+        <div class="panel database-panel">
+          <div class="panel-header">
+            <h3><svg class="icon"><use href="#i-database"/></svg>System Database</h3>
+            <span class="badge overview-badge">ACTIVE</span>
+          </div>
+          <div class="database-grid">
+            <div class="db-item" data-gsap="fade-up">
+              <span class="db-label">Total Events</span>
+              <span class="db-value" id="total-events">1,247</span>
+            </div>
+            <div class="db-item" data-gsap="fade-up" data-delay="0.1">
+              <span class="db-label">Active Hazards</span>
+              <span class="db-value" id="active-hazards">3</span>
+            </div>
+            <div class="db-item" data-gsap="fade-up" data-delay="0.2">
+              <span class="db-label">Resolved Incidents</span>
+              <span class="db-value">1,198</span>
+            </div>
+            <div class="db-item" data-gsap="fade-up" data-delay="0.3">
+              <span class="db-label">Compliance Rate</span>
+              <span class="db-value">96.1%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Locked State Overlay -->
+  <div id="lockout-overlay" class="lockout-overlay" style="display:none;">
+    <div class="lockout-content">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <svg class="icon" style="width: 64px; height: 64px; color: #ff1744; animation: pulse 1.5s ease-in-out infinite;"><use href="#i-lock"/></svg>
+        <h2 style="color: #ff1744; font-size: 2rem; margin: 0;">🚨 SYSTEM LOCKED</h2>
+        <p style="color: var(--muted); font-size: 1rem; margin: 0;">Emergency lockout is active. All operations are suspended.</p>
+        <div class="lockout-timer">
+          <span id="lockout-countdown">00:00</span>
+        </div>
+        <button id="lockout-unlock-btn" class="btn btn-primary" style="
+          padding: 14px 32px; 
+          font-size: 1.1rem; 
+          font-weight: 700;
+          background: var(--accent);
+          color: var(--accent-ink);
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          transition: all 0.3s ease;
+          box-shadow: 0 0 30px rgba(180, 255, 58, 0.2);
+        ">
+          <svg class="icon icon-sm"><use href="#i-unlock"/></svg> Unlock System
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="emergency.js"></script>
+  <script src="system-overview.js"></script>
+</body>
+</html>

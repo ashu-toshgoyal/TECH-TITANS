@@ -1,0 +1,402 @@
+/* ============================================================
+   SAFEGUARD AI — Safety Report Page Styles
+   ============================================================ */
+
+/* ---- Report Controls ---- */
+.report-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    padding: 16px 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.report-period-selector {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.report-period-selector label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.report-select {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    min-width: 160px;
+}
+
+.report-select:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.report-select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ---- Stats Grid ---- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--panel);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.stat-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.stat-icon .icon {
+    width: 26px;
+    height: 26px;
+}
+
+/* Stat Card Variations */
+.stat-total .stat-icon {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border);
+}
+
+.stat-high .stat-icon {
+    color: #ff1744;
+    background: rgba(255, 23, 68, 0.1);
+    border-color: rgba(255, 23, 68, 0.3);
+}
+
+.stat-medium .stat-icon {
+    color: #ffb020;
+    background: rgba(255, 176, 32, 0.1);
+    border-color: rgba(255, 176, 32, 0.3);
+}
+
+.stat-compliant .stat-icon {
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+
+/* ---- Charts Grid ---- */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+@media (max-width: 900px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-panel {
+    padding: 20px;
+    margin-bottom: 0;
+}
+
+.chart-container {
+    position: relative;
+    height: 320px;
+    width: 100%;
+}
+
+/* ---- Report Table ---- */
+.report-table-panel {
+    margin-bottom: 22px;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 700px;
+}
+
+.report-table thead {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.report-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.report-table td {
+    padding: 12px 16px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.report-table tbody tr {
+    transition: background 0.2s;
+}
+
+.report-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.report-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.no-data-row {
+    text-align: center;
+    padding: 40px !important;
+    color: var(--dim);
+    font-size: 0.95rem;
+}
+
+.risk-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+}
+
+/* ---- PPE Compliance Summary ---- */
+.ppe-summary-panel {
+    margin-bottom: 22px;
+}
+
+.ppe-compliance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.ppe-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.ppe-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(180, 255, 58, 0.3);
+}
+
+.ppe-icon {
+    font-size: 2rem;
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.ppe-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ppe-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.ppe-compliance-bar {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    width: 100%;
+}
+
+.ppe-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), #6fe3ff);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ppe-percentage {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 700;
+    text-align: right;
+}
+
+/* ---- Print Styles ---- */
+@media print {
+    .sidebar {
+        display: none !important;
+    }
+    
+    .main-content {
+        padding: 20px !important;
+    }
+    
+    .report-controls {
+        display: none !important;
+    }
+    
+    .stat-card {
+        break-inside: avoid;
+    }
+    
+    .charts-grid {
+        break-inside: avoid;
+    }
+    
+    .table-container {
+        overflow: visible !important;
+    }
+    
+    .report-table {
+        font-size: 0.75rem;
+    }
+}
+
+/* ---- Loading State ---- */
+.report-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--muted);
+    gap: 12px;
+}
+
+.report-loading .icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ---- Responsive Adjustments ---- */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-card {
+        padding: 16px;
+    }
+    
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .stat-value {
+        font-size: 1.4rem;
+    }
+    
+    .ppe-compliance-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .report-period-selector {
+        width: 100%;
+    }
+    
+    .report-select {
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 14px;
+    }
+}

@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+ultralytics
+opencv-python-headless
+pillow
+python-multipart
+google-genai
+python-dotenv
+requests
+google-genai

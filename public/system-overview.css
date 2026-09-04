@@ -1,0 +1,350 @@
+/* ============================================================
+   SYSTEM OVERVIEW - SAFEGUARD AI
+   Custom styles for system overview page
+   ============================================================ */
+
+/* ===== Architecture Diagram ===== */
+.architecture-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    flex-wrap: wrap;
+    min-height: 120px;
+}
+
+.arch-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 24px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    min-width: 90px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.arch-node.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.arch-node:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 30px rgba(180, 255, 58, 0.1);
+}
+
+.arch-icon {
+    font-size: 2rem;
+}
+
+.arch-node span {
+    font-size: 0.75rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.arch-status {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+.arch-status.online {
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.15);
+}
+
+.arch-status.offline {
+    color: #ff1744;
+    background: rgba(255, 23, 68, 0.15);
+}
+
+.arch-arrow {
+    color: var(--accent);
+    font-size: 1.5rem;
+    opacity: 0.6;
+}
+
+/* ===== Overview Grid ===== */
+.overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 1100px) {
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Specs Grid ===== */
+.specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px;
+    background: var(--panel-2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+.spec-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.spec-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.spec-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.usage-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.usage-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+}
+
+/* ===== Camera Specs ===== */
+.camera-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.camera-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--panel-2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.camera-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.camera-icon {
+    font-size: 1.2rem;
+}
+
+.camera-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.camera-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.camera-value {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+/* ===== Memory Grid ===== */
+.memory-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.memory-item {
+    padding: 14px 16px;
+    background: var(--panel-2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+.memory-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.memory-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.memory-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.memory-usage {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+/* ===== Network Grid ===== */
+.network-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.network-item {
+    padding: 12px 14px;
+    background: var(--panel-2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+.network-item.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.network-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.network-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== Database Grid ===== */
+.database-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.db-item {
+    padding: 14px 16px;
+    background: var(--panel-2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+.db-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.db-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.db-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 4px;
+}
+
+/* ===== Panel Overrides ===== */
+.overview-grid .panel {
+    margin-bottom: 0;
+}
+
+.overview-grid .panel-header {
+    margin-bottom: 12px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .specs-grid,
+    .camera-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .network-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .database-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .architecture-diagram {
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .arch-node {
+        padding: 12px 16px;
+        min-width: 60px;
+    }
+    
+    .arch-arrow {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .network-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .database-grid {
+        grid-template-columns: 1fr;
+    }
+}
