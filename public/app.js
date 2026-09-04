@@ -251,7 +251,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // ============================================
     // 4. VIDEO PROCESSING (YOLO)
     // ============================================
-    const API_URL = "https://pythonengine-196922836719.asia-south1.run.app";
+    
+    // ✅ FIXED URL with correct API path
+    const API_URL = "https://pythonengine-196922836719.asia-south1.run.app/api/process-image";
+    // Fallback for local testing
+    const API_URL_LOCAL = "http://localhost:8000/api/process-image";
+
     const fileInput = document.getElementById("file-input");
     const loadingBarContainer = document.getElementById("loading-bar-container");
     const loadingBarFill = document.getElementById("loading-bar-fill");
@@ -380,52 +385,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showLoadingState(true, "🔍 Analyzing with YOLOv8...");
 
-        try {
-            setProgressBar(35);
+        // Try Production URL first, then fallback to local
+        const urls = [API_URL, API_URL_LOCAL];
+        
+        for (const url of urls) {
+            try {
+                setProgressBar(35);
 
-            const response = await fetch(API_URL, {
-                method: "POST",
-                body: formData
-            });
+                const response = await fetch(url, {
+                    method: "POST",
+                    body: formData
+                });
 
-            setProgressBar(80);
+                setProgressBar(80);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || "Error processing image.");
-            }
+                if (!response.ok) {
+                    continue; // Try next URL
+                }
 
-            const data = await response.json();
-            setProgressBar(100);
+                const data = await response.json();
+                setProgressBar(100);
 
-            if (data.status === "success") {
-                // Store marked image URL
-                markedImageUrl = data.images?.marked || null;
-                lastProcessedData = data;
-                
-                setTimeout(() => {
-                    renderResults(data);
-                    showLoadingState(false, "✅ Analysis Complete");
+                if (data.status === "success") {
+                    // Store marked image URL
+                    markedImageUrl = data.images?.marked || null;
+                    lastProcessedData = data;
                     
-                    if (data.metadata && data.metadata.timestamp) {
-                        const clockText = document.getElementById("clock-text");
-                        if (clockText) {
-                            clockText.textContent = data.metadata.timestamp;
+                    setTimeout(() => {
+                        renderResults(data);
+                        showLoadingState(false, "✅ Analysis Complete");
+                        
+                        if (data.metadata && data.metadata.timestamp) {
+                            const clockText = document.getElementById("clock-text");
+                            if (clockText) {
+                                clockText.textContent = data.metadata.timestamp;
+                            }
                         }
-                    }
+                        
+                        // After processing, show the appropriate image based on toggle state
+                        updateImageDisplay();
+                    }, 300);
                     
-                    // After processing, show the appropriate image based on toggle state
-                    updateImageDisplay();
-                }, 300);
-            } else {
-                alert("Failed to process image.");
-                showLoadingState(false, "Upload CCTV Frame or Stream");
+                    return; // ✅ Success, exit loop
+                }
+            } catch (error) {
+                console.error(`Upload failed to ${url}:`, error);
             }
-        } catch (error) {
-            console.error("Upload failed:", error);
-            alert(`Error: ${error.message}`);
-            showLoadingState(false, "Upload CCTV Frame or Stream");
         }
+
+        // If all URLs fail
+        alert("❌ Error: Failed to fetch. Please make sure your backend is running.");
+        showLoadingState(false, "Upload CCTV Frame or Stream");
     }
 
     function showLoadingState(isLoading, message) {
