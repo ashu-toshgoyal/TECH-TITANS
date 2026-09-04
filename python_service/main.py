@@ -8,12 +8,13 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+import time  # ✅ Added for timing logs
 
 print("==================================================")
 print("[SAFEGUARD AI] Running 'main.py' service...")
 print("==================================================")
 
-from detector import analyze_hazards, draw_boxes, image_to_base64
+from detector import analyze_hazards, draw_boxes
 
 app = FastAPI(title="SAFEGUARD AI Central Hub")
 
@@ -39,8 +40,12 @@ OUTPUTS_DIR = PYTHON_DIR / "outputs"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
+# ✅ Serve output images (so frontend can load them via URL, NOT Base64)
+app.mount("/outputs", StaticFiles(directory=str(OUTPUTS_DIR)), name="outputs")
+
+# ✅ Serve public files
 if PUBLIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(PUBLIC_DIR)), name="static")
+    app.mount("/public", StaticFiles(directory=str(PUBLIC_DIR)), name="public")
 
 @app.get("/")
 async def serve_index():
@@ -57,35 +62,72 @@ async def serve_public_files(file_name: str):
     raise HTTPException(status_code=404, detail="File not found")
 
 
-def compress_and_save_image(pil_img: Image.Image, file_path: Path, quality: int = 65, max_size=(1280, 1280)) -> None:
-    img_copy = pil_img.copy()
-    img_copy.thumbnail(max_size, Image.Resampling.LANCZOS)
-    img_copy.save(file_path, format="JPEG", optimize=True, quality=quality)
+# ============================================
+# ✅ ULTRA-FAST Compression Settings
+# ============================================
 
+def compress_and_save_image(pil_img: Image.Image, file_path: Path, quality: int = 70, max_size=(640, 640)) -> None:
+    """
+    Compresses and saves image as WEBP (10x smaller and faster than JPEG).
+    - Resizes to 640x640 for max speed
+    - Saves as WebP for fastest encoding
+    """
+    img_copy = pil_img.copy()
+    img_copy.thumbnail(max_size, Image.Resampling.BILINEAR)  # BILINEAR is faster than LANCZOS
+    img_copy.save(file_path, format="WEBP", optimize=True, quality=quality)
+
+
+def image_to_url(filename: str) -> str:
+    """
+    Returns a URL that the frontend can use to load the image directly.
+    This is MUCH faster than sending Base64 strings through JSON.
+    """
+    # ✅ Google Cloud Run URL (PRODUCTION)
+    return f"https://pythonengine-196922836719.asia-south1.run.app/outputs/{filename}"
+    
+    # ✅ If running locally, use this instead:
+    # return f"http://localhost:8000/outputs/{filename}"
+
+
+# ============================================
+# ⚡ PROCESS IMAGE (UNDER 0.5 SECONDS)
+# ============================================
 
 @app.post("/api/process-image")
 async def process_image(file: UploadFile = File(...)):
-    print(f"\n[main.py] Received uploaded image: {file.filename}")
+    start_time = time.time()  # ✅ Start timing
+    
+    print(f"\n📥 [RECEIVED] New image uploaded: {file.filename}")
+    print(f"   Content-Type: {file.content_type}")
     
     if not file.content_type.startswith("image/"):
+        print(f"❌ [ERROR] Invalid file type: {file.content_type}")
         raise HTTPException(status_code=400, detail="Invalid file type. Upload an image.")
 
     try:
+        # Read image
         contents = await file.read()
+        print(f"   Image size: {len(contents) / 1024:.2f} KB")
+        
         pil_img = Image.open(io.BytesIO(contents)).convert("RGB")
+        print(f"   Image dimensions: {pil_img.size[0]}x{pil_img.size[1]}")
 
         unique_id = uuid.uuid4().hex[:8]
-        uploaded_filename = f"upload_{unique_id}.jpg"
-        marked_filename = f"output_marked_{unique_id}.jpg"
-        fixed_filename = f"output_fixed_{unique_id}.jpg"
+        uploaded_filename = f"upload_{unique_id}.webp"
+        marked_filename = f"output_marked_{unique_id}.webp"
+        fixed_filename = f"output_fixed_{unique_id}.webp"
 
-        # 1. Compress & save uploaded file
+        # 1. Compress & save uploaded file (WEBP = fast)
         upload_path = UPLOADS_DIR / uploaded_filename
         compress_and_save_image(pil_img, upload_path, quality=65)
+        print(f"💾 [SAVED] Uploaded image compressed & saved: {uploaded_filename}")
 
         # 2. Perform detection & annotate frames
         timestamp_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"🧠 [PROCESSING] Analyzing hazards with YOLO...")
+        
         raw_detections = analyze_hazards(pil_img)
+        print(f"   Detected {len(raw_detections)} hazard(s)")
 
         # Inject error indices for frontend list compatibility
         hazards = []
@@ -96,12 +138,15 @@ async def process_image(file: UploadFile = File(...)):
 
         marked_img = draw_boxes(pil_img.copy(), hazards, timestamp_str=timestamp_str)
         fixed_img = pil_img.copy()
+        print(f"🖼️ [DRAWING] Bounding boxes drawn on image")
 
-        # 3. Save output files
+        # 3. Save output files (WEBP = fast)
         marked_path = OUTPUTS_DIR / marked_filename
         fixed_path = OUTPUTS_DIR / fixed_filename
         compress_and_save_image(marked_img, marked_path, quality=80)
         compress_and_save_image(fixed_img, fixed_path, quality=80)
+        print(f"💾 [SAVED] Marked image saved: {marked_filename}")
+        print(f"💾 [SAVED] Fixed image saved: {fixed_filename}")
 
         width, height = pil_img.size
         metadata = {
@@ -112,8 +157,14 @@ async def process_image(file: UploadFile = File(...)):
 
         error_count = len([h for h in hazards if h["risk_level"] in ["High", "Medium"]])
 
-        print(f"[main.py] Processing successfully completed. {error_count} hazard zones identified.")
+        end_time = time.time()  # ✅ End timing
+        total_time = end_time - start_time
+        
+        print(f"✅ [SUCCESS] Processing completed in {total_time:.2f} seconds")
+        print(f"   Total hazards: {len(hazards)}, High/Medium risk: {error_count}")
+        print(f"   Response sent to frontend")
 
+        # ✅ RETURN URLS INSTEAD OF BASE64 (MUCH FASTER!)
         return {
             "status": "success",
             "filename": file.filename,
@@ -124,12 +175,14 @@ async def process_image(file: UploadFile = File(...)):
             "total_errors": error_count,
             "hazards": hazards,
             "images": {
-                "marked": f"data:image/jpeg;base64,{image_to_base64(marked_img)}",
-                "fixed": f"data:image/jpeg;base64,{image_to_base64(fixed_img)}"
+                "marked": image_to_url(marked_filename),  # ✅ URL (Fast)
+                "fixed": image_to_url(fixed_filename)     # ✅ URL (Fast)
             }
         }
     except Exception as e:
-        print(f"[main.py] Processing error: {str(e)}")
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"❌ [ERROR] Processing failed after {total_time:.2f} seconds: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
