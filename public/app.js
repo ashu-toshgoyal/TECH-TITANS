@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ============================================
     // 4. VIDEO PROCESSING (YOLO)
     // ============================================
-    const API_URL = "http://localhost:8000/api/process-image";
+    const API_URL = "https://pythonengine-196922836719.asia-south1.run.app";
     const fileInput = document.getElementById("file-input");
     const loadingBarContainer = document.getElementById("loading-bar-container");
     const loadingBarFill = document.getElementById("loading-bar-fill");
