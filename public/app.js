@@ -249,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ============================================
-    // 4. VIDEO PROCESSING (YOLO)
+    // 4. VIDEO PROCESSING (YOLO) - FOR CCTV FEED
     // ============================================
     
     // ✅ Production URL (Google Cloud)
@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ============================================
-    // 5. IMAGE COMPRESSION & UPLOAD HANDLING
+    // 5. ACCURATE FILE UPLOAD HANDLING (Backend First)
     // ============================================
     
     // ✅ Compress image in Browser before uploading (REDUCES SIZE BY 90%!)
@@ -393,15 +393,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const file = event.target.files[0];
             if (!file) return;
 
+            // Store the original image URL for toggle functionality
+            originalImageUrl = URL.createObjectURL(file);
+
             // ✅ Compress the image first (Reduces upload size from 12MB to 200KB)
             showLoadingState(true, "🖼️ Compressing image...");
             
             try {
                 const compressedFile = await compressImage(file, 800, 0.7);
                 
-                // Store the original image URL for toggle functionality
-                originalImageUrl = URL.createObjectURL(file);
-
                 const formData = new FormData();
                 formData.append("file", compressedFile); // ✅ Upload compressed file
 
@@ -455,9 +455,58 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
 
-                // If all URLs fail
-                alert("❌ Error: Failed to fetch. Please make sure your backend is running.");
-                showLoadingState(false, "Upload CCTV Frame or Stream");
+                // If all URLs fail, fall back to TensorFlow.js
+                showLoadingState(true, "⚠️ Backend unreachable. Using browser AI...");
+                
+                // Load TensorFlow.js model if not loaded
+                if (!tfModel) {
+                    await loadTFModel();
+                }
+                
+                const img = new Image();
+                img.onload = async () => {
+                    const predictions = await tfModel.detect(img);
+                    
+                    const hazards = predictions.map((pred, idx) => ({
+                        hazard_name: pred.class,
+                        class_name: pred.class,
+                        risk_level: getRiskFromClass(pred.class),
+                        confidence: pred.score,
+                        bbox: [
+                            (pred.bbox[1] / img.height) * 1000,
+                            (pred.bbox[0] / img.width) * 1000,
+                            ((pred.bbox[1] + pred.bbox[3]) / img.height) * 1000,
+                            ((pred.bbox[0] + pred.bbox[2]) / img.width) * 1000
+                        ],
+                        error_index: idx + 1
+                    }));
+                    
+                    markedImageUrl = drawBoxesOnCanvas(img, predictions);
+                    
+                    const data = {
+                        status: "success",
+                        metadata: {
+                            dimensions: `${img.width}x${img.height}`,
+                            timestamp: new Date().toLocaleString(),
+                            camera_model: "Browser TensorFlow.js (Fallback)"
+                        },
+                        total_errors: hazards.length,
+                        hazards: hazards,
+                        images: {
+                            marked: markedImageUrl,
+                            fixed: originalImageUrl
+                        }
+                    };
+                    
+                    lastProcessedData = data;
+                    
+                    setTimeout(() => {
+                        renderResults(data);
+                        showLoadingState(false, "✅ Analysis Complete (Fallback)");
+                        updateImageDisplay();
+                    }, 100);
+                };
+                img.src = originalImageUrl;
                 
             } catch (error) {
                 console.error("Image compression error:", error);
@@ -512,7 +561,82 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ============================================
-    // 6. RISK COLOR CODING
+    // 6. TENSORFLOW.JS FALLBACK MODEL (For when backend is down)
+    // ============================================
+    let tfModel = null;
+    
+    async function loadTFModel() {
+        try {
+            // Load COCO-SSD model (Fast, runs in browser)
+            tfModel = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
+            console.log("✅ TensorFlow.js Model Loaded!");
+        } catch (error) {
+            console.error("Failed to load model:", error);
+        }
+    }
+
+    // Draw boxes using Canvas (Instant, no backend needed)
+    function drawBoxesOnCanvas(img, predictions) {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        
+        // Draw the original image
+        ctx.drawImage(img, 0, 0);
+        
+        // Draw bounding boxes
+        predictions.forEach(pred => {
+            const [x, y, width, height] = pred.bbox;
+            
+            // Determine color based on risk
+            const risk = getRiskFromClass(pred.class);
+            const colors = {
+                'High': '#ff1744',
+                'Medium': '#ffb020',
+                'Low': '#4caf50'
+            };
+            const color = colors[risk] || '#4caf50';
+            
+            // Draw rectangle
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, width, height);
+            
+            // Draw label
+            ctx.fillStyle = color;
+            ctx.font = '14px Arial';
+            const label = `${pred.class} (${(pred.score * 100).toFixed(0)}%)`;
+            const textWidth = ctx.measureText(label).width;
+            
+            ctx.fillRect(x, Math.max(0, y - 20), textWidth + 10, 20);
+            ctx.fillStyle = 'white';
+            ctx.fillText(label, x + 5, Math.max(14, y - 6));
+        });
+        
+        // Convert to data URL
+        return canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    // Get risk level based on detected class
+    function getRiskFromClass(className) {
+        const lower = className.toLowerCase();
+        
+        if (lower.includes('person') || lower.includes('human')) {
+            return 'Medium';
+        } else if (lower.includes('helmet') || lower.includes('hardhat')) {
+            return 'Low'; // Wearing helmet = safe
+        } else if (lower.includes('vest')) {
+            return 'Low'; // Wearing vest = safe
+        } else if (lower.includes('car') || lower.includes('truck')) {
+            return 'Medium';
+        }
+        
+        return 'Low';
+    }
+
+    // ============================================
+    // 7. RISK COLOR CODING
     // ============================================
     function getRiskColor(riskLevel) {
         const risk = String(riskLevel).toLowerCase().trim();
@@ -566,7 +690,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ============================================
-    // 7. RENDER RESULTS
+    // 8. RENDER RESULTS
     // ============================================
     function renderResults(data) {
         if (detectionCountBadge) {
@@ -575,7 +699,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Show the marked image if engine is ON
-        if (isEngineOn && data.images && data.images.marked) {
+        if (data.images && data.images.marked) {
             markedImageUrl = data.images.marked;
             processedStream.src = markedImageUrl;
             processedStream.style.display = "block";
@@ -596,13 +720,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span>🕐 <b>${data.metadata.timestamp || 'N/A'}</b></span>
                 `;
             }
-            
-            if (data.metadata.timestamp) {
-                const clockText = document.getElementById("clock-text");
-                if (clockText) {
-                    clockText.textContent = data.metadata.timestamp;
-                }
-            }
         }
 
         if (detectionsList) {
@@ -618,54 +735,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         <p style="color: #4caf50; font-size: 1.1rem; font-weight: 600;">✅ No hazards detected. Workplace is safe!</p>
                     </div>`;
                 return;
-            }
-
-            const riskOrder = { 'high': 0, 'medium': 1, 'low': 2, 'compliant': 3, 'safe': 4 };
-            hazards.sort((a, b) => {
-                const riskA = String(a.risk_level || '').toLowerCase();
-                const riskB = String(b.risk_level || '').toLowerCase();
-                return (riskOrder[riskA] ?? 5) - (riskOrder[riskB] ?? 5);
-            });
-
-            const highCount = hazards.filter(h => String(h.risk_level || '').toLowerCase() === 'high').length;
-            const mediumCount = hazards.filter(h => String(h.risk_level || '').toLowerCase() === 'medium').length;
-            const lowCount = hazards.filter(h => String(h.risk_level || '').toLowerCase() === 'low').length;
-            const compliantCount = hazards.filter(h => 
-                ['compliant', 'safe', 'clear'].includes(String(h.risk_level || '').toLowerCase())
-            ).length;
-
-            if (highCount > 0 || mediumCount > 0 || lowCount > 0) {
-                const summaryDiv = document.createElement("div");
-                summaryDiv.style.cssText = `
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 10px;
-                    padding: 10px 14px;
-                    margin-bottom: 12px;
-                    border-radius: 10px;
-                    background: rgba(255, 255, 255, 0.04);
-                    border: 1px solid var(--border);
-                    font-size: 0.8rem;
-                    align-items: center;
-                `;
-                
-                let summaryHTML = '<span style="font-weight: 600; color: var(--text);">📊 Risk Summary:</span>';
-                if (highCount > 0) {
-                    summaryHTML += `<span style="color: #ff1744;">🔴 ${highCount} High</span>`;
-                }
-                if (mediumCount > 0) {
-                    summaryHTML += `<span style="color: #ffb020;">🟡 ${mediumCount} Medium</span>`;
-                }
-                if (lowCount > 0) {
-                    summaryHTML += `<span style="color: #4caf50;">🟢 ${lowCount} Low</span>`;
-                }
-                if (compliantCount > 0) {
-                    summaryHTML += `<span style="color: #2196f3;">🔵 ${compliantCount} Compliant</span>`;
-                }
-                summaryHTML += `<span style="color: var(--muted); margin-left: auto;">Total: ${hazards.length}</span>`;
-                
-                summaryDiv.innerHTML = summaryHTML;
-                detectionsList.appendChild(summaryDiv);
             }
 
             hazards.forEach((hazard, index) => {
@@ -731,7 +800,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================================
-// 8. STYLES
+// 9. STYLES
 // ============================================
 const style = document.createElement('style');
 style.textContent = `
